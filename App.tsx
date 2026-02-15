@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
 const navItems = [
   { label: '제품', href: '#product' },
@@ -9,16 +9,16 @@ const navItems = [
 
 const features = [
   {
-    title: 'AI 툴 통합 검색',
-    description: '카테고리와 목적에 따라 필요한 AI 서비스를 빠르게 탐색할 수 있습니다.',
+    title: '3D 인터랙티브 대시보드',
+    description: '마우스 움직임에 따라 카드가 기울어지며 핵심 지표를 입체적으로 보여줍니다.',
   },
   {
-    title: '워크플로우 자동화',
-    description: '마케팅, 개발, 디자인 작업을 자동화하여 팀 생산성을 극대화합니다.',
+    title: '실시간 오토메이션 추천',
+    description: '팀의 사용 패턴을 분석해 다음 액션을 제안하고 작업 흐름을 자동화합니다.',
   },
   {
-    title: '팀 협업 대시보드',
-    description: '도입한 툴의 활용도와 비용을 한 화면에서 모니터링하고 관리합니다.',
+    title: '초고속 검색 & 필터링',
+    description: '필요한 AI 도구를 목적별, 가격별로 빠르게 비교해 즉시 도입할 수 있습니다.',
   },
 ];
 
@@ -28,7 +28,24 @@ const pricing = [
   { name: 'Enterprise', price: '맞춤 견적', desc: '대규모 조직, 보안/운영 지원' },
 ];
 
+const orbitItems = [
+  { label: 'Chat', degree: 0 },
+  { label: 'Image', degree: 72 },
+  { label: 'Code', degree: 144 },
+  { label: 'Video', degree: 216 },
+  { label: 'Data', degree: 288 },
+];
+
 const App: React.FC = () => {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const heroTransform = useMemo(
+    () => ({
+      transform: `perspective(1400px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+    }),
+    [tilt]
+  );
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur">
@@ -54,23 +71,32 @@ const App: React.FC = () => {
       </header>
 
       <main>
-        <section className="relative overflow-hidden">
-          <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
-          <div className="absolute -right-10 top-24 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl" />
+        <section
+          className="relative overflow-hidden"
+          onMouseMove={(event) => {
+            const { innerWidth, innerHeight } = window;
+            const y = ((event.clientX / innerWidth) * 2 - 1) * 8;
+            const x = -((event.clientY / innerHeight) * 2 - 1) * 8;
+            setTilt({ x, y });
+          }}
+          onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+        >
+          <div className="absolute -left-20 top-10 h-64 w-64 animate-blob rounded-full bg-indigo-500/20 blur-3xl" />
+          <div className="absolute -right-10 top-24 h-72 w-72 animate-blob rounded-full bg-fuchsia-500/20 blur-3xl [animation-delay:2s]" />
 
           <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-6 pb-20 pt-24 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="mb-4 inline-block rounded-full border border-indigo-300/40 bg-indigo-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-200">
-                Next Generation AI Tool Platform
+                Dynamic 3D Experience
               </p>
               <h1 className="text-4xl font-bold leading-tight text-white md:text-6xl">
-                팀의 업무 속도를 높이는
+                3D 요소로 완성한
                 <br />
-                올인원 AI 랜딩 허브
+                다이나믹 AI 웹페이지
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-slate-300">
-                AI Nexus는 다양한 AI 서비스를 검색, 비교, 도입까지 한 번에 진행할 수 있는 플랫폼입니다.
-                복잡한 도구 탐색을 줄이고 빠르게 성과를 만드세요.
+                화면이 사용자의 움직임에 반응하고, 정보 카드가 입체적으로 떠오르는 인터랙션으로
+                브랜드 경험을 강화합니다.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
@@ -88,18 +114,40 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-900 p-8 shadow-2xl">
-              <h2 className="text-xl font-semibold text-white">오늘의 KPI</h2>
-              <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                {[
-                  { value: '2,300+', label: '등록된 AI 툴' },
-                  { value: '41%', label: '탐색 시간 단축' },
-                  { value: '4.9/5', label: '고객 만족도' },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-lg border border-white/10 bg-white/5 p-4 text-center">
-                    <p className="text-2xl font-bold text-indigo-200">{item.value}</p>
-                    <p className="mt-2 text-xs text-slate-300">{item.label}</p>
+            <div className="relative w-full max-w-xl">
+              <div
+                style={heroTransform}
+                className="transition-transform duration-200 [transform-style:preserve-3d]"
+              >
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-900 p-8 shadow-2xl [transform:translateZ(50px)]">
+                  <h2 className="text-xl font-semibold text-white">실시간 퍼포먼스</h2>
+                  <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                    {[
+                      { value: '2,300+', label: '등록된 AI 툴' },
+                      { value: '41%', label: '탐색 시간 단축' },
+                      { value: '4.9/5', label: '고객 만족도' },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-lg border border-white/10 bg-white/5 p-4 text-center [transform:translateZ(35px)]"
+                      >
+                        <p className="text-2xl font-bold text-indigo-200">{item.value}</p>
+                        <p className="mt-2 text-xs text-slate-300">{item.label}</p>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              </div>
+
+              <div className="pointer-events-none absolute -right-4 -top-8 h-44 w-44 animate-[spin_14s_linear_infinite] [transform-style:preserve-3d]">
+                {orbitItems.map((item) => (
+                  <span
+                    key={item.label}
+                    style={{ transform: `rotate(${item.degree}deg) translateX(88px)` }}
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-300/40 bg-slate-900/70 px-3 py-1 text-xs text-indigo-100"
+                  >
+                    {item.label}
+                  </span>
                 ))}
               </div>
             </div>
@@ -110,8 +158,8 @@ const App: React.FC = () => {
           <div className="mx-auto max-w-6xl px-6">
             <h2 className="text-3xl font-bold text-white">제품 소개</h2>
             <p className="mt-4 max-w-3xl text-slate-300">
-              AI Nexus는 수많은 AI 툴을 직관적으로 정리하고, 도입 의사결정까지 돕는 B2B SaaS 플랫폼입니다.
-              팀 단위 협업 기능과 자동화 추천으로 AI 활용의 진입장벽을 낮춥니다.
+              AI Nexus는 수많은 AI 툴을 직관적으로 정리하고, 3D 인터랙션 기반 UI로 몰입감 있는 탐색 경험을
+              제공하는 B2B SaaS 플랫폼입니다.
             </p>
           </div>
         </section>
@@ -119,8 +167,12 @@ const App: React.FC = () => {
         <section id="features" className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-3xl font-bold text-white">핵심 기능</h2>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {features.map((feature) => (
-              <article key={feature.title} className="rounded-xl border border-white/10 bg-white/5 p-6">
+            {features.map((feature, index) => (
+              <article
+                key={feature.title}
+                className="rounded-xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-indigo-300/50"
+                style={{ animationDelay: `${index * 120}ms` }}
+              >
                 <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
                 <p className="mt-3 text-slate-300">{feature.description}</p>
               </article>
@@ -133,7 +185,10 @@ const App: React.FC = () => {
             <h2 className="text-3xl font-bold text-white">요금제</h2>
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {pricing.map((plan) => (
-                <article key={plan.name} className="rounded-xl border border-white/10 bg-white/5 p-6">
+                <article
+                  key={plan.name}
+                  className="rounded-xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:[transform:perspective(900px)_rotateX(6deg)_rotateY(-6deg)]"
+                >
                   <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
                   <p className="mt-3 text-3xl font-bold text-indigo-200">{plan.price}</p>
                   <p className="mt-2 text-slate-300">{plan.desc}</p>
