@@ -1,57 +1,51 @@
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 
 const navItems = [
-  { label: '제품', href: '#product' },
-  { label: '기능', href: '#features' },
-  { label: '요금', href: '#pricing' },
-  { label: '문의', href: '#contact' },
+  { label: '서비스', href: '#services' },
+  { label: '파트너', href: '#partners' },
+  { label: '고객문의', href: '#contact' },
 ];
 
-const features = [
+const services = [
   {
-    title: '3D 인터랙티브 대시보드',
-    description: '마우스 움직임에 따라 카드가 기울어지며 핵심 지표를 입체적으로 보여줍니다.',
+    title: '배터리 진단 컨설팅',
+    description:
+      '운영 중인 배터리 설비의 상태를 점검하고, 수명 예측 및 교체 시점을 데이터 기반으로 제안합니다.',
   },
   {
-    title: '실시간 오토메이션 추천',
-    description: '팀의 사용 패턴을 분석해 다음 액션을 제안하고 작업 흐름을 자동화합니다.',
+    title: '충전 인프라 구축',
+    description:
+      '현장 환경에 맞는 충전 스테이션 설계부터 설치, 운영 매뉴얼 제작까지 원스톱으로 지원합니다.',
   },
   {
-    title: '초고속 검색 & 필터링',
-    description: '필요한 AI 도구를 목적별, 가격별로 빠르게 비교해 즉시 도입할 수 있습니다.',
+    title: 'B2B 정기 관리 프로그램',
+    description:
+      '기업 고객을 위한 정기 점검과 리포트 제공으로 안정적인 배터리 운영과 비용 절감을 실현합니다.',
   },
 ];
 
-const pricing = [
-  { name: 'Starter', price: '₩0', desc: '개인 사용자, 기본 탐색 기능' },
-  { name: 'Growth', price: '₩39,000', desc: '소규모 팀, 자동화 기능 포함' },
-  { name: 'Enterprise', price: '맞춤 견적', desc: '대규모 조직, 보안/운영 지원' },
-];
-
-const orbitItems = [
-  { label: 'Chat', degree: 0 },
-  { label: 'Image', degree: 72 },
-  { label: 'Code', degree: 144 },
-  { label: 'Video', degree: 216 },
-  { label: 'Data', degree: 288 },
+const partners = [
+  {
+    name: '스마트물류 주식회사',
+    focus: '물류 차량용 배터리 교체 주기 최적화 프로젝트 진행',
+  },
+  {
+    name: '그린모빌리티 협동조합',
+    focus: '지역 전기이륜차 충전 거점 공동 구축',
+  },
+  {
+    name: '에코테크 솔루션',
+    focus: '산업용 배터리 안전관리 프로토콜 공동 연구',
+  },
 ];
 
 const App: React.FC = () => {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const heroTransform = useMemo(
-    () => ({
-      transform: `perspective(1400px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-    }),
-    [tilt]
-  );
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+    <div className="min-h-screen bg-[#0b3d91] text-white">
+      <header className="sticky top-0 z-30 border-b border-[#ffd84d]/40 bg-[#0b3d91]/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <a href="#" className="text-xl font-bold text-white">
-            AI Nexus
+          <a href="#" className="font-display text-2xl font-bold text-[#ffd84d]">
+            배터리프랜즈
           </a>
           <nav>
             <ul className="flex gap-2 sm:gap-4">
@@ -59,7 +53,7 @@ const App: React.FC = () => {
                 <li key={item.label}>
                   <a
                     href={item.href}
-                    className="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
+                    className="rounded-lg px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#ffd84d] hover:text-[#0b3d91]"
                   >
                     {item.label}
                   </a>
@@ -71,127 +65,51 @@ const App: React.FC = () => {
       </header>
 
       <main>
-        <section
-          className="relative overflow-hidden"
-          onMouseMove={(event) => {
-            const { innerWidth, innerHeight } = window;
-            const y = ((event.clientX / innerWidth) * 2 - 1) * 8;
-            const x = -((event.clientY / innerHeight) * 2 - 1) * 8;
-            setTilt({ x, y });
-          }}
-          onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-        >
-          <div className="absolute -left-20 top-10 h-64 w-64 animate-blob rounded-full bg-indigo-500/20 blur-3xl" />
-          <div className="absolute -right-10 top-24 h-72 w-72 animate-blob rounded-full bg-fuchsia-500/20 blur-3xl [animation-delay:2s]" />
-
-          <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-6 pb-20 pt-24 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="mb-4 inline-block rounded-full border border-indigo-300/40 bg-indigo-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-200">
-                Dynamic 3D Experience
-              </p>
-              <h1 className="text-4xl font-bold leading-tight text-white md:text-6xl">
-                3D 요소로 완성한
-                <br />
-                다이나믹 AI 웹페이지
-              </h1>
-              <p className="mt-6 text-lg leading-relaxed text-slate-300">
-                화면이 사용자의 움직임에 반응하고, 정보 카드가 입체적으로 떠오르는 인터랙션으로
-                브랜드 경험을 강화합니다.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="#pricing"
-                  className="rounded-lg bg-indigo-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-indigo-300"
-                >
-                  무료로 시작하기
-                </a>
-                <a
-                  href="#features"
-                  className="rounded-lg border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-                >
-                  기능 살펴보기
-                </a>
-              </div>
-            </div>
-
-            <div className="relative w-full max-w-xl">
-              <div
-                style={heroTransform}
-                className="transition-transform duration-200 [transform-style:preserve-3d]"
-              >
-                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-900 p-8 shadow-2xl [transform:translateZ(50px)]">
-                  <h2 className="text-xl font-semibold text-white">실시간 퍼포먼스</h2>
-                  <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                    {[
-                      { value: '2,300+', label: '등록된 AI 툴' },
-                      { value: '41%', label: '탐색 시간 단축' },
-                      { value: '4.9/5', label: '고객 만족도' },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        className="rounded-lg border border-white/10 bg-white/5 p-4 text-center [transform:translateZ(35px)]"
-                      >
-                        <p className="text-2xl font-bold text-indigo-200">{item.value}</p>
-                        <p className="mt-2 text-xs text-slate-300">{item.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pointer-events-none absolute -right-4 -top-8 h-44 w-44 animate-[spin_14s_linear_infinite] [transform-style:preserve-3d]">
-                {orbitItems.map((item) => (
-                  <span
-                    key={item.label}
-                    style={{ transform: `rotate(${item.degree}deg) translateX(88px)` }}
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-300/40 bg-slate-900/70 px-3 py-1 text-xs text-indigo-100"
-                  >
-                    {item.label}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="product" className="border-y border-white/10 bg-slate-900/60 py-16">
-          <div className="mx-auto max-w-6xl px-6">
-            <h2 className="text-3xl font-bold text-white">제품 소개</h2>
-            <p className="mt-4 max-w-3xl text-slate-300">
-              AI Nexus는 수많은 AI 툴을 직관적으로 정리하고, 3D 인터랙션 기반 UI로 몰입감 있는 탐색 경험을
-              제공하는 B2B SaaS 플랫폼입니다.
+        <section className="border-b border-[#ffd84d]/30 bg-gradient-to-br from-[#0b3d91] via-[#1555c0] to-[#0b3d91]">
+          <div className="mx-auto max-w-6xl px-6 py-20">
+            <p className="inline-block rounded-full bg-[#ffd84d] px-4 py-1 text-xs font-bold tracking-wide text-[#0b3d91]">
+              POWER YOUR TOMORROW
+            </p>
+            <h1 className="mt-6 font-display text-4xl font-bold leading-tight md:text-6xl">
+              믿을 수 있는 배터리 운영 파트너,
+              <br />
+              배터리프랜즈
+            </h1>
+            <p className="mt-6 max-w-3xl text-lg text-blue-100">
+              배터리프랜즈는 기업과 기관의 배터리 사용 환경을 안전하고 효율적으로 바꾸는 전문 브랜드입니다.
+              진단, 구축, 운영관리까지 연결해 더 긴 수명과 더 낮은 운영비를 만들어드립니다.
             </p>
           </div>
         </section>
 
-        <section id="features" className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-3xl font-bold text-white">핵심 기능</h2>
+        <section id="services" className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="font-display text-3xl font-bold text-[#ffd84d]">서비스</h2>
+          <p className="mt-3 text-blue-100">현장 중심으로 설계된 핵심 서비스를 제공합니다.</p>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {features.map((feature, index) => (
+            {services.map((service) => (
               <article
-                key={feature.title}
-                className="rounded-xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-indigo-300/50"
-                style={{ animationDelay: `${index * 120}ms` }}
+                key={service.title}
+                className="rounded-xl border border-[#ffd84d]/50 bg-[#0d47a1] p-6 shadow-lg shadow-blue-950/30"
               >
-                <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
-                <p className="mt-3 text-slate-300">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-[#ffd84d]">{service.title}</h3>
+                <p className="mt-3 text-blue-100">{service.description}</p>
               </article>
             ))}
           </div>
         </section>
 
-        <section id="pricing" className="border-y border-white/10 bg-slate-900/60 py-16">
+        <section id="partners" className="border-y border-[#ffd84d]/30 bg-[#114aa5] py-16">
           <div className="mx-auto max-w-6xl px-6">
-            <h2 className="text-3xl font-bold text-white">요금제</h2>
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {pricing.map((plan) => (
+            <h2 className="font-display text-3xl font-bold text-[#ffd84d]">파트너</h2>
+            <p className="mt-3 text-blue-100">배터리프랜즈와 함께 성장하는 협력사를 소개합니다.</p>
+            <div className="mt-8 space-y-4">
+              {partners.map((partner) => (
                 <article
-                  key={plan.name}
-                  className="rounded-xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:[transform:perspective(900px)_rotateX(6deg)_rotateY(-6deg)]"
+                  key={partner.name}
+                  className="rounded-xl border border-[#ffd84d]/40 bg-[#0b3d91] p-6"
                 >
-                  <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
-                  <p className="mt-3 text-3xl font-bold text-indigo-200">{plan.price}</p>
-                  <p className="mt-2 text-slate-300">{plan.desc}</p>
+                  <h3 className="text-xl font-semibold text-white">{partner.name}</h3>
+                  <p className="mt-2 text-blue-100">{partner.focus}</p>
                 </article>
               ))}
             </div>
@@ -199,17 +117,20 @@ const App: React.FC = () => {
         </section>
 
         <section id="contact" className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-3xl font-bold text-white">문의하기</h2>
-          <p className="mt-4 text-slate-300">도입 상담 및 데모 요청은 아래로 연락해 주세요.</p>
-          <div className="mt-6 rounded-xl border border-indigo-300/30 bg-indigo-400/10 p-6 text-slate-100">
-            <p>이메일: hello@ainexus.io</p>
-            <p className="mt-2">전화: 02-3456-7890</p>
+          <h2 className="font-display text-3xl font-bold text-[#ffd84d]">고객문의</h2>
+          <p className="mt-3 text-blue-100">
+            프로젝트 상담, 제휴 문의, 방문 미팅 예약까지 아래 연락처로 편하게 문의해주세요.
+          </p>
+          <div className="mt-6 rounded-xl border border-[#ffd84d] bg-[#ffd84d] p-6 text-[#0b3d91]">
+            <p className="text-lg font-semibold">브랜드명: 배터리프랜즈</p>
+            <p className="mt-2 font-medium">대표: 박민서</p>
+            <p className="mt-2 font-medium">전화번호: 010-7339-4768</p>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-white/10 py-8 text-center text-sm text-slate-400">
-        © {new Date().getFullYear()} AI Nexus. All rights reserved.
+      <footer className="border-t border-[#ffd84d]/30 py-8 text-center text-sm text-blue-100">
+        © {new Date().getFullYear()} 배터리프랜즈 | 대표 박민서 | 010-7339-4768
       </footer>
     </div>
   );
