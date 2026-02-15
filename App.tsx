@@ -1,170 +1,135 @@
-import React, { useState } from 'react';
-import { ToolCard } from './components/ToolCard';
-import { DiscoveryBar } from './components/DiscoveryBar';
-import { AITool } from './types';
-import { suggestAITools } from './services/geminiService';
+import React from 'react';
 
-const DEFAULT_TOOLS: AITool[] = [
-  {
-    id: 'gamma-1',
-    name: 'Gamma',
-    url: 'https://gamma.app/',
-    description: 'A new medium for presenting ideas. Powered by AI, create beautiful, engaging content with none of the formatting work.',
-    category: 'Presentation'
-  },
-  {
-    id: 'chatgpt-1',
-    name: 'ChatGPT',
-    url: 'https://chatgpt.com/',
-    description: 'OpenAI\'s advanced conversational AI model capable of answering follow-up questions, admitting mistakes, and challenging incorrect premises.',
-    category: 'Chatbot'
-  },
-  {
-    id: 'notebooklm-1',
-    name: 'NotebookLM',
-    url: 'https://notebooklm.google/',
-    description: 'An AI-first notebook, grounded in your own documents, designed to help you gain insights faster from your reading material.',
-    category: 'Research'
-  }
+const navItems = [
+  { label: '회사소개', href: '#about' },
+  { label: '서비스', href: '#services' },
+  { label: '성과', href: '#impact' },
+  { label: '문의하기', href: '#contact' },
 ];
 
 const App: React.FC = () => {
-  const [tools, setTools] = useState<AITool[]>(DEFAULT_TOOLS);
-  const [nameInput, setNameInput] = useState('');
-  const [isDiscovering, setIsDiscovering] = useState(false);
-  const [discoveredTools, setDiscoveredTools] = useState<AITool[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleDiscovery = async (query: string) => {
-    setIsDiscovering(true);
-    setError(null);
-    try {
-      const newTools = await suggestAITools(query);
-      if (newTools.length > 0) {
-        setDiscoveredTools(newTools);
-      } else {
-        setError("I couldn't find any specific tools for that request. Try rephrasing!");
-      }
-    } catch (err) {
-      setError("Something went wrong while connecting to the AI brain.");
-    } finally {
-      setIsDiscovering(false);
-    }
-  };
-
-  const clearDiscovery = () => {
-    setDiscoveredTools([]);
-    setError(null);
-  };
-
   return (
-    <div className="min-h-screen bg-background text-slate-100 selection:bg-primary selection:text-white relative overflow-hidden">
-      
-      {/* Ambient Background Effects */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-accent/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
-      </div>
-
-      <main className="relative z-10 container mx-auto px-4 sm:px-6 pt-20 pb-32">
-        
-        {/* Header Section */}
-        <div className="text-center mb-16 max-w-4xl mx-auto">
-          <div className="inline-block mb-4 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-            <span className="text-xs font-semibold tracking-wider uppercase bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              The Intelligent Directory
-            </span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 tracking-tight text-white drop-shadow-lg">
-            AI <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">Nexus</span>
-          </h1>
-          <p className="text-slate-400 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto">
-            Curate, discover, and organize your essential AI tools in one beautiful workspace.
-          </p>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-slate-950/90 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+          <a href="#" className="text-xl font-bold tracking-wide text-white">
+            배터리
+          </a>
+          <nav>
+            <ul className="flex gap-2 sm:gap-4">
+              {navItems.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
+      </header>
 
-        {/* Discovery Bar */}
-        <div className="max-w-2xl mx-auto mb-8 p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md">
-          <label htmlFor="name-input" className="block text-sm text-slate-300 mb-2 font-medium">
-            이름 입력
-          </label>
-          <input
-            id="name-input"
-            type="text"
-            value={nameInput}
-            onChange={(event) => setNameInput(event.target.value)}
-            placeholder="박민서"
-            className="w-full rounded-xl bg-background/70 border border-white/10 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/60"
-          />
-          <p className="mt-3 text-slate-300">
-            입력된 이름: <span className="font-semibold text-white">{nameInput || '아직 입력되지 않았어요.'}</span>
-          </p>
-        </div>
-
-        <DiscoveryBar onSearch={handleDiscovery} isLoading={isDiscovering} />
-
-        {/* Error Message */}
-        {error && (
-          <div className="max-w-2xl mx-auto mb-10 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-200 text-center animate-pulse backdrop-blur-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Discovered Tools Section */}
-        {discoveredTools.length > 0 && (
-          <div className="mb-20 animate-fade-in">
-            <div className="flex items-end justify-between mb-8 px-2 border-b border-white/10 pb-4">
-              <div>
-                <h2 className="text-3xl font-display font-bold text-white flex items-center">
-                  <span className="w-1.5 h-8 bg-gradient-to-b from-primary to-secondary rounded-full mr-4"></span>
-                  Discovered Results
-                </h2>
-                <p className="text-slate-500 mt-1 ml-5.5 text-sm">AI-powered recommendations based on your query</p>
-              </div>
-              <button 
-                onClick={clearDiscovery}
-                className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+      <main>
+        <section className="mx-auto flex max-w-6xl flex-col gap-10 px-6 pb-20 pt-24 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="mb-3 inline-block rounded-full border border-cyan-400/40 bg-cyan-400/10 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-300">
+              Energy Innovation Company
+            </p>
+            <h1 className="text-4xl font-bold leading-tight text-white md:text-6xl">
+              더 밝은 내일을 충전하는
+              <br />
+              스마트 에너지 파트너, 배터리
+            </h1>
+            <p className="mt-6 text-lg leading-relaxed text-slate-300">
+              배터리는 기업과 고객의 지속 가능한 성장을 위해 고효율 배터리 솔루션을 제공합니다.
+              안정적인 기술력과 빠른 대응으로 차세대 에너지 시장을 선도합니다.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#contact"
+                className="rounded-lg bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-cyan-300"
               >
-                Clear Results
-              </button>
+                상담 요청하기
+              </a>
+              <a
+                href="#services"
+                className="rounded-lg border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                서비스 보기
+              </a>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {discoveredTools.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
+          </div>
+
+          <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-400/20 via-slate-900 to-slate-900 p-8 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">배터리 핵심 가치</h2>
+            <ul className="mt-5 space-y-4 text-slate-200">
+              <li>⚡ 고성능 배터리 설계 및 공급</li>
+              <li>🌱 친환경 에너지 전환 컨설팅</li>
+              <li>🛠️ 산업별 맞춤 유지보수 서비스</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="about" className="border-y border-white/10 bg-slate-900/60 py-16">
+          <div className="mx-auto max-w-6xl px-6">
+            <h2 className="text-3xl font-bold text-white">회사소개</h2>
+            <p className="mt-4 max-w-3xl text-slate-300">
+              배터리는 에너지 저장 기술의 혁신을 목표로 설립된 전문 기업입니다.
+              우리는 검증된 품질, 신뢰할 수 있는 운영, 고객 중심의 프로젝트 관리로
+              다양한 산업군의 에너지 효율을 극대화합니다.
+            </p>
+          </div>
+        </section>
+
+        <section id="services" className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="text-3xl font-bold text-white">서비스</h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {[
+              { title: 'ESS 구축', desc: '기업 환경에 맞춘 에너지 저장 시스템 구축 및 최적화.' },
+              { title: '배터리 진단', desc: '실시간 모니터링 기반 배터리 수명 분석과 리포트 제공.' },
+              { title: '기술 지원', desc: '도입부터 운영까지 전 주기 컨설팅과 기술 지원 제공.' },
+            ].map((service) => (
+              <article key={service.title} className="rounded-xl border border-white/10 bg-white/5 p-6">
+                <h3 className="text-xl font-semibold text-white">{service.title}</h3>
+                <p className="mt-3 text-slate-300">{service.desc}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="impact" className="border-y border-white/10 bg-slate-900/60 py-16">
+          <div className="mx-auto max-w-6xl px-6">
+            <h2 className="text-3xl font-bold text-white">성과</h2>
+            <div className="mt-8 grid gap-5 sm:grid-cols-3">
+              {[
+                { value: '120+', label: '누적 프로젝트' },
+                { value: '35%', label: '평균 에너지 비용 절감' },
+                { value: '98%', label: '고객 만족도' },
+              ].map((item) => (
+                <div key={item.label} className="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+                  <p className="text-3xl font-bold text-cyan-300">{item.value}</p>
+                  <p className="mt-2 text-slate-300">{item.label}</p>
+                </div>
               ))}
             </div>
           </div>
-        )}
+        </section>
 
-        {/* Favorites Section */}
-        <div>
-          <div className="flex items-end mb-8 px-2 border-b border-white/10 pb-4">
-             <div>
-                <h2 className="text-3xl font-display font-bold text-white flex items-center">
-                  <span className="w-1.5 h-8 bg-gradient-to-b from-secondary to-accent rounded-full mr-4"></span>
-                  My Favorites
-                </h2>
-                <p className="text-slate-500 mt-1 ml-5.5 text-sm">Your pinned collection of daily drivers</p>
-             </div>
+        <section id="contact" className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="text-3xl font-bold text-white">문의하기</h2>
+          <p className="mt-4 text-slate-300">홍보 및 도입 상담은 아래 연락처로 문의해 주세요.</p>
+          <div className="mt-6 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-6 text-slate-100">
+            <p>이메일: contact@battery.co.kr</p>
+            <p className="mt-2">전화: 02-1234-5678</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {tools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} />
-            ))}
-          </div>
-        </div>
-
+        </section>
       </main>
 
-      <footer className="relative z-10 py-12 text-center border-t border-white/5 bg-background/50 backdrop-blur-xl">
-        <div className="container mx-auto px-4">
-          <p className="text-slate-500 text-sm font-medium">
-            &copy; {new Date().getFullYear()} AI Nexus. Engineered with <span className="text-primary">Gemini 2.5 Flash</span>.
-          </p>
-        </div>
+      <footer className="border-t border-white/10 py-8 text-center text-sm text-slate-400">
+        © {new Date().getFullYear()} 배터리. All rights reserved.
       </footer>
     </div>
   );
