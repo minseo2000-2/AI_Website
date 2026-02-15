@@ -33,9 +33,14 @@ View your app in AI Studio: https://ai.studio/apps/drive/10tnnQ5xu2YQ-L3FKt2pJ39
 - `npm run build`: 프로덕션 빌드 생성
 - `npm run preview`: 빌드 결과 미리보기
 
-## 배포
+## 배포 (GitHub Actions + GitHub Pages)
 
-프로덕션 배포 전 아래 명령으로 빌드가 정상 동작하는지 확인하세요.
+1. GitHub 저장소의 **Settings → Secrets and variables → Actions** 에서 아래 시크릿을 추가합니다.
+   - `GEMINI_API_KEY`
+2. GitHub 저장소의 **Settings → Pages** 에서 Source를 **GitHub Actions** 로 설정합니다.
+3. `main` 브랜치에 푸시하면 `.github/workflows/deploy.yml` 워크플로가 실행되어 `dist`를 자동 배포합니다.
+
+프로덕션 배포 전 로컬에서 빌드 확인:
 
 ```bash
 npm run build
