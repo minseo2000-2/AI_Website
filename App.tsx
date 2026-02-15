@@ -30,6 +30,7 @@ const DEFAULT_TOOLS: AITool[] = [
 
 const App: React.FC = () => {
   const [tools, setTools] = useState<AITool[]>(DEFAULT_TOOLS);
+  const [nameInput, setNameInput] = useState('');
   const [isDiscovering, setIsDiscovering] = useState(false);
   const [discoveredTools, setDiscoveredTools] = useState<AITool[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -85,6 +86,23 @@ const App: React.FC = () => {
         </div>
 
         {/* Discovery Bar */}
+        <div className="max-w-2xl mx-auto mb-8 p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md">
+          <label htmlFor="name-input" className="block text-sm text-slate-300 mb-2 font-medium">
+            이름 입력
+          </label>
+          <input
+            id="name-input"
+            type="text"
+            value={nameInput}
+            onChange={(event) => setNameInput(event.target.value)}
+            placeholder="박민서"
+            className="w-full rounded-xl bg-background/70 border border-white/10 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/60"
+          />
+          <p className="mt-3 text-slate-300">
+            입력된 이름: <span className="font-semibold text-white">{nameInput || '아직 입력되지 않았어요.'}</span>
+          </p>
+        </div>
+
         <DiscoveryBar onSearch={handleDiscovery} isLoading={isDiscovering} />
 
         {/* Error Message */}
