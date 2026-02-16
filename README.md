@@ -27,6 +27,10 @@ View your app in AI Studio: https://ai.studio/apps/drive/10tnnQ5xu2YQ-L3FKt2pJ39
    ```
 4. 브라우저에서 출력된 로컬 주소(기본: `http://localhost:5173`)로 접속합니다.
 
+
+> 참고: 배포 경로가 루트(`/`)가 아닌 경우 `VITE_BASE_PATH`를 설정하세요.  
+> 예: GitHub Pages 저장소 경로가 `/AI_Website/`라면 `VITE_BASE_PATH=/AI_Website/`.
+
 ## 사용 가능한 스크립트
 
 - `npm run dev`: 개발 서버 실행

@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      VITE_BASE_PATH: /AI_Website/
     steps:
       - name: Checkout
         uses: actions/checkout@v4
