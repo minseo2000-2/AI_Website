@@ -1,128 +1,162 @@
-import React from 'react';
+import React, { FormEvent, useMemo, useState } from 'react';
 
-const navItems = [
-  { label: '서비스', href: '#services' },
-  { label: '파트너', href: '#partners' },
-  { label: '고객문의', href: '#contact' },
-];
+type ChatRole = 'system' | 'user' | 'assistant';
 
-const services = [
-  {
-    title: '배터리 진단 컨설팅',
-    description:
-      '운영 중인 배터리 설비의 상태를 점검하고, 수명 예측 및 교체 시점을 데이터 기반으로 제안합니다.',
-  },
-  {
-    title: '충전 인프라 구축',
-    description:
-      '현장 환경에 맞는 충전 스테이션 설계부터 설치, 운영 매뉴얼 제작까지 원스톱으로 지원합니다.',
-  },
-  {
-    title: 'B2B 정기 관리 프로그램',
-    description:
-      '기업 고객을 위한 정기 점검과 리포트 제공으로 안정적인 배터리 운영과 비용 절감을 실현합니다.',
-  },
-];
+type ChatMessage = {
+  role: ChatRole;
+  content: string;
+};
 
-const partners = [
-  {
-    name: '스마트물류 주식회사',
-    focus: '물류 차량용 배터리 교체 주기 최적화 프로젝트 진행',
-  },
-  {
-    name: '그린모빌리티 협동조합',
-    focus: '지역 전기이륜차 충전 거점 공동 구축',
-  },
-  {
-    name: '에코테크 솔루션',
-    focus: '산업용 배터리 안전관리 프로토콜 공동 연구',
-  },
-];
+const defaultAssistantMessage: ChatMessage = {
+  role: 'assistant',
+  content: '안녕하세요! OpenAI-compatible API에 연결된 챗봇입니다. 궁금한 내용을 입력해 보세요.',
+};
 
 const App: React.FC = () => {
+  const [baseUrl, setBaseUrl] = useState('https://ai.sbtech.co.kr/v1');
+  const [apiKey, setApiKey] = useState('');
+  const [model, setModel] = useState('gpt-4o-mini');
+  const [systemPrompt, setSystemPrompt] = useState('너는 한국어로 친절하게 답변하는 도우미야.');
+
+  const [messages, setMessages] = useState<ChatMessage[]>([defaultAssistantMessage]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const canSend = useMemo(() => input.trim().length > 0 && !isLoading, [input, isLoading]);
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!canSend) return;
+
+    const userMessage: ChatMessage = { role: 'user', content: input.trim() };
+    const historyForApi: ChatMessage[] = messages
+      .slice(1)
+      .filter((message) => message.role !== 'system')
+      .filter((message) => message.content.trim().length > 0);
+
+    const payloadMessages: ChatMessage[] = [
+      ...(systemPrompt.trim() ? [{ role: 'system' as const, content: systemPrompt.trim() }] : []),
+      ...historyForApi,
+      userMessage,
+    ];
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(apiKey.trim() ? { Authorization: `Bearer ${apiKey.trim()}` } : {}),
+        },
+        body: JSON.stringify({
+          model,
+          messages: payloadMessages,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`요청 실패 (${response.status}): ${text || response.statusText}`);
+      }
+
+      const data = await response.json();
+      const assistantText = data?.choices?.[0]?.message?.content;
+
+      if (!assistantText || typeof assistantText !== 'string') {
+        throw new Error('응답 형식이 올바르지 않습니다. choices[0].message.content 값을 확인하세요.');
+      }
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: assistantText }]);
+    } catch (requestError) {
+      const message = requestError instanceof Error ? requestError.message : '알 수 없는 오류가 발생했습니다.';
+      setError(message);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: '죄송합니다. 응답을 가져오지 못했습니다. 설정값을 확인한 뒤 다시 시도해주세요.',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="site">
-      <header className="header">
-        <div className="container header-inner">
-          <a href="#" className="brand">
-            배터리프랜즈
-          </a>
-          <nav>
-            <ul className="nav-list">
-              {navItems.map((item) => (
-                <li key={item.label}>
-                  <a href={item.href} className="nav-link">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
+    <div className="app-shell">
+      <header className="top-bar">
+        <h1>OpenAI-compatible 챗봇</h1>
+        <p>기본 엔드포인트: <code>https://ai.sbtech.co.kr/v1</code></p>
       </header>
 
-      <main>
-        <section className="hero">
-          <div className="container hero-inner">
-            <p className="badge">POWER YOUR TOMORROW</p>
-            <h1 className="hero-title">
-              믿을 수 있는 배터리 운영 파트너,
-              <br />
-              배터리프랜즈
-            </h1>
-            <p className="hero-desc">
-              배터리프랜즈는 기업과 기관의 배터리 사용 환경을 안전하고 효율적으로 바꾸는 전문 브랜드입니다.
-              진단, 구축, 운영관리까지 연결해 더 긴 수명과 더 낮은 운영비를 만들어드립니다.
-            </p>
-          </div>
-        </section>
+      <main className="main-layout">
+        <aside className="config-panel">
+          <h2>연결 설정</h2>
 
-        <section id="services" className="section">
-          <div className="container">
-            <h2 className="section-title">서비스</h2>
-            <p className="section-desc">현장 중심으로 설계된 핵심 서비스를 제공합니다.</p>
-            <div className="services-grid">
-              {services.map((service) => (
-                <article key={service.title} className="card">
-                  <h3 className="card-title">{service.title}</h3>
-                  <p className="card-desc">{service.description}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+          <label>
+            Base URL
+            <input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder="https://ai.sbtech.co.kr/v1" />
+          </label>
 
-        <section id="partners" className="section partner-wrap">
-          <div className="container">
-            <h2 className="section-title">파트너</h2>
-            <p className="section-desc">배터리프랜즈와 함께 성장하는 협력사를 소개합니다.</p>
-            <div className="partner-list">
-              {partners.map((partner) => (
-                <article key={partner.name} className="partner-item">
-                  <h3 className="partner-name">{partner.name}</h3>
-                  <p className="card-desc">{partner.focus}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+          <label>
+            API Key (선택)
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="sk-..."
+              autoComplete="off"
+            />
+          </label>
 
-        <section id="contact" className="section">
-          <div className="container">
-            <h2 className="section-title">고객문의</h2>
-            <p className="section-desc">
-              프로젝트 상담, 제휴 문의, 방문 미팅 예약까지 아래 연락처로 편하게 문의해주세요.
-            </p>
-            <div className="contact-box">
-              <p>브랜드명: 배터리프랜즈</p>
-              <p>대표: 박민서</p>
-              <p>전화번호: 010-7339-4768</p>
-            </div>
+          <label>
+            Model
+            <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="gpt-4o-mini" />
+          </label>
+
+          <label>
+            System Prompt
+            <textarea
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+              placeholder="도우미의 기본 동작을 입력하세요"
+              rows={5}
+            />
+          </label>
+        </aside>
+
+        <section className="chat-panel">
+          <div className="chat-window">
+            {messages.map((message, index) => (
+              <article key={`${message.role}-${index}`} className={`bubble ${message.role}`}>
+                <span className="role">{message.role === 'user' ? '나' : 'AI'}</span>
+                <p>{message.content}</p>
+              </article>
+            ))}
+            {isLoading && <article className="bubble assistant loading">응답 생성 중...</article>}
           </div>
+
+          {error && <p className="error-text">{error}</p>}
+
+          <form className="chat-form" onSubmit={handleSubmit}>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="메시지를 입력하고 Enter 또는 전송 버튼을 눌러주세요"
+              rows={3}
+            />
+            <button type="submit" disabled={!canSend}>
+              {isLoading ? '전송 중...' : '전송'}
+            </button>
+          </form>
         </section>
       </main>
-
-      <footer className="footer">© {new Date().getFullYear()} 배터리프랜즈 | 대표 박민서 | 010-7339-4768</footer>
     </div>
   );
 };
