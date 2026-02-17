@@ -21,10 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      VITE_BASE_PATH: /AI_Website/
+      VITE_BASE_PATH: ${{ format('/{0}/', github.event.repository.name) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Preflight checks
+        run: |
+          echo "event_name=${{ github.event_name }}"
+          echo "ref=${{ github.ref }}"
+          echo "repository=${{ github.repository }}"
+          echo "resolved_base_path=${VITE_BASE_PATH}"
+
+          if [ -z "${GEMINI_API_KEY}" ]; then
+            echo "::error::GEMINI_API_KEY secret is missing. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,6 +49,11 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify build output
+        run: |
+          test -f dist/index.html
+          ls -lah dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
