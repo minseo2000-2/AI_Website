@@ -31,6 +31,8 @@ View your app in AI Studio: https://ai.studio/apps/drive/10tnnQ5xu2YQ-L3FKt2pJ39
 > 참고: 빌드 기본값은 상대 경로(`./`)라서 정적 호스팅 하위 경로에서도 동작합니다. 루트(`/`) 또는 특정 하위 경로를 강제하고 싶다면 `VITE_BASE_PATH`를 설정하세요.  
 > 예: GitHub Pages 저장소 경로가 `/AI_Website/`라면 `VITE_BASE_PATH=/AI_Website/`.
 
+GitHub Actions 배포 워크플로에서는 `VITE_BASE_PATH`를 `${{ github.event.repository.name }}` 기반으로 자동 계산합니다.
+
 ## 사용 가능한 스크립트
 
 - `npm run dev`: 개발 서버 실행
@@ -43,6 +45,11 @@ View your app in AI Studio: https://ai.studio/apps/drive/10tnnQ5xu2YQ-L3FKt2pJ39
    - `GEMINI_API_KEY`
 2. GitHub 저장소의 **Settings → Pages** 에서 Source를 **GitHub Actions** 로 설정합니다.
 3. `main` 브랜치에 푸시하면 `.github/workflows/deploy.yml` 워크플로가 실행되어 `dist`를 자동 배포합니다.
+   - 워크플로는 아래 항목을 단계적으로 체크합니다.
+     - 이벤트/브랜치/저장소 정보 출력
+     - `GEMINI_API_KEY` 시크릿 존재 여부 확인 (누락 시 명확한 에러로 즉시 실패)
+     - `npm ci` / `npm run build` 수행
+     - `dist/index.html` 존재 여부 및 산출물 목록 검증
 
 프로덕션 배포 전 로컬에서 빌드 확인:
 
