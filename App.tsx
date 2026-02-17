@@ -25,6 +25,8 @@ const App: React.FC = () => {
 
   const canSend = useMemo(() => input.trim().length > 0 && !isLoading, [input, isLoading]);
 
+  const REQUEST_TIMEOUT_MS = 20000;
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!canSend) return;
@@ -46,9 +48,13 @@ const App: React.FC = () => {
     setIsLoading(true);
     setError(null);
 
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
     try {
       const response = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
         method: 'POST',
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           ...(apiKey.trim() ? { Authorization: `Bearer ${apiKey.trim()}` } : {}),
@@ -74,7 +80,12 @@ const App: React.FC = () => {
 
       setMessages((prev) => [...prev, { role: 'assistant', content: assistantText }]);
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : '알 수 없는 오류가 발생했습니다.';
+      const message =
+        requestError instanceof DOMException && requestError.name === 'AbortError'
+          ? `요청이 ${REQUEST_TIMEOUT_MS / 1000}초를 초과해 중단되었습니다. Base URL과 네트워크 상태를 확인해주세요.`
+          : requestError instanceof Error
+            ? requestError.message
+            : '알 수 없는 오류가 발생했습니다.';
       setError(message);
       setMessages((prev) => [
         ...prev,
@@ -84,6 +95,7 @@ const App: React.FC = () => {
         },
       ]);
     } finally {
+      window.clearTimeout(timeoutId);
       setIsLoading(false);
     }
   };
