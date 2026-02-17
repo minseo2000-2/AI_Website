@@ -1,4 +1,4 @@
-import React, { FormEvent, useMemo, useState } from 'react';
+import React, { FormEvent, KeyboardEvent, useMemo, useState } from 'react';
 
 type ChatRole = 'system' | 'user' | 'assistant';
 
@@ -100,6 +100,14 @@ const App: React.FC = () => {
     }
   };
 
+  const handleInputKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      if (!canSend) return;
+      void handleSubmit(event);
+    }
+  };
+
   return (
     <div className="app-shell">
       <header className="top-bar">
@@ -160,6 +168,7 @@ const App: React.FC = () => {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleInputKeyDown}
               placeholder="메시지를 입력하고 Enter 또는 전송 버튼을 눌러주세요"
               rows={3}
             />
