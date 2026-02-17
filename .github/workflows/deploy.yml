@@ -21,17 +21,40 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      VITE_BASE_PATH: ${{ format('/{0}/', github.event.repository.name) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve base path
+        id: base
+        shell: bash
+        run: |
+          # 우선순위: Repository Variable(VITE_BASE_PATH) > 자동 계산
+          if [ -n "${{ vars.VITE_BASE_PATH }}" ]; then
+            base="${{ vars.VITE_BASE_PATH }}"
+          elif [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ]; then
+            # User/Org Pages 저장소는 루트(/)에 배포
+            base="/"
+          else
+            # Project Pages 저장소는 /<repo>/ 경로에 배포
+            base="/${{ github.event.repository.name }}/"
+          fi
+
+          # 선행 슬래시/후행 슬래시 보정
+          if [ "$base" != "/" ]; then
+            base="/${base#/}"
+            base="${base%/}/"
+          fi
+
+          echo "VITE_BASE_PATH=$base" >> "$GITHUB_ENV"
+          echo "base_path=$base" >> "$GITHUB_OUTPUT"
 
       - name: Preflight checks
         run: |
           echo "event_name=${{ github.event_name }}"
           echo "ref=${{ github.ref }}"
           echo "repository=${{ github.repository }}"
-          echo "resolved_base_path=${VITE_BASE_PATH}"
+          echo "resolved_base_path=${{ steps.base.outputs.base_path }}"
 
           if [ -z "${GEMINI_API_KEY}" ]; then
             echo "::error::GEMINI_API_KEY secret is missing. Add it in Settings > Secrets and variables > Actions."
